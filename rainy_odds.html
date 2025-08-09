@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raindrop Race</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        @keyframes rain {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+        .rainfall-bg {
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px), radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 5px 5px;
+            animation: rain 30s linear infinite;
+        }
+        .raindrop {
+            position: absolute; top: 0; width: 30px; height: 70px;
+            border-radius: 50% 50% 50% 50% / 70% 70% 30% 30%;
+            display: flex; justify-content: center; align-items: center;
+            background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 60%), linear-gradient(to bottom, rgba(147, 197, 253, 0.5) 0%, rgba(59, 130, 246, 0.4) 100%);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.7), inset 0 -5px 8px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+            transition: all 0.3s ease;
+        }
+        .raindrop.bet-raindrop, .raindrop.player-drop-1 {
+            background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 60%), linear-gradient(to bottom, rgba(253, 230, 138, 0.7) 0%, rgba(252, 211, 77, 0.6) 100%);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), inset 0 -5px 8px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(252, 211, 77, 0.3);
+        }
+        .raindrop.winner-raindrop {
+            background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 60%), linear-gradient(to bottom, rgba(190, 242, 100, 0.7) 0%, rgba(34, 197, 94, 0.6) 100%);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), inset 0 -5px 8px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(34, 197, 94, 0.4);
+        }
+        .raindrop.player-drop-2 { background: linear-gradient(to bottom, #fca5a5, #ef4444); } /* Red */
+        .raindrop.player-drop-3 { background: linear-gradient(to bottom, #86efac, #22c55e); } /* Green */
+        .raindrop.player-drop-4 { background: linear-gradient(to bottom, #a5b4fc, #6366f1); } /* Indigo */
+        .raindrop.player-drop-5 { background: linear-gradient(to bottom, #f9a8d4, #ec4899); } /* Pink */
+        
+        .raindrop-name { color: rgba(0, 0, 50, 0.7); font-size: 0.8rem; font-weight: bold; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5); }
+        .finish-line { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background-color: #ef4444; }
+        .race-track-container { position: relative; height: 600px; overflow: hidden; background-color: #eff6ff; border-radius: 1rem; box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); padding: 1rem; }
+        .race-overlay { position: absolute; inset: 0; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; border-radius: 1rem; color: white; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-white flex items-center justify-center min-h-screen p-4 md:p-8">
+    <div class="w-full max-w-7xl p-6 bg-white shadow-xl rounded-2xl border-2 border-blue-200">
+        <div class="flex justify-start space-x-2 mb-4">
+            <button id="show-singleplayer-btn" class="px-4 py-2 font-bold bg-blue-600 text-white rounded-lg shadow-md">Single Player</button>
+            <button id="show-multiplayer-btn" class="px-4 py-2 font-bold bg-gray-200 text-gray-800 rounded-lg">Multiplayer</button>
+        </div>
+
+        <div id="single-player-mode">
+             <header class="flex flex-col md:flex-row justify-between items-center mb-6">
+                 <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-droplets text-blue-500"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.72-3.1L7 2L4.72 9.15C3.57 10.05 3 11.15 3 12.25c0 2.22 1.8 4.01 4 4.05z"/><path d="M10.9 19.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.72-3.1L10.9 9l-2.28 7.15c-1.15.9-1.72 2-1.72 3.1c0 2.22 1.8 4.01 4 4.05z"/><path d="M18.9 22.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.72-3.1L18.9 12l-2.28 7.15c-1.15.9-1.72 2-1.72 3.1c0 2.22 1.8 4.01 4 4.05z"/></svg>
+                     <h1 class="text-3xl font-extrabold text-blue-700 tracking-tight">Raindrop Race</h1>
+                 </div>
+                 <div class="rounded-xl border bg-card text-card-foreground shadow-lg">
+                     <div class="p-4 flex flex-row items-center justify-between space-y-0 pb-2">
+                         <h3 class="tracking-tight text-sm font-medium text-gray-500">Current Balance</h3>
+                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dollar-sign text-green-500"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                     </div>
+                     <div class="p-4 pt-0">
+                         <div id="balance-display" class="text-3xl font-bold text-green-600">$1000.00</div>
+                     </div>
+                 </div>
+             </header>
+             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                 <div class="lg:col-span-2">
+                     <div id="race-track-container-sp" class="race-track-container rainfall-bg">
+                         <div class="finish-line"></div>
+                         <div id="race-overlay-sp" class="race-overlay hidden">
+                             <h2 id="winner-message-sp" class="text-3xl md:text-5xl font-extrabold text-white text-center animate-pulse"></h2>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="lg:col-span-1">
+                     <div class="h-full flex flex-col p-6 shadow-lg rounded-2xl border-2 border-gray-100 bg-white">
+                         <h3 class="text-2xl font-bold text-blue-700 mb-4">Game Controls</h3>
+                         <div class="flex-grow p-0 space-y-6">
+                             <div>
+                                 <label for="user-name" class="block text-sm font-medium text-gray-700 mb-2">Enter Your Name</label>
+                                 <input id="user-name" type="text" placeholder="e.g., Jane Doe" class="w-full h-10 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                             </div>
+                             <div>
+                                 <label class="block text-sm font-medium text-gray-700 mb-2">Select Raindrop</label>
+                                 <div id="raindrop-buttons-container" class="grid grid-cols-5 gap-2"></div>
+                             </div>
+                             <div>
+                                 <label for="bet-amount-slider" class="block text-sm font-medium text-gray-700 mb-2">Bet Amount: $<span id="bet-amount-value">100</span></label>
+                                 <input type="range" id="bet-amount-slider" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" min="10" max="1000" step="10" value="100"/>
+                                 <p class="text-xs text-gray-500 mt-1">Max bet: $<span id="max-bet-value">1000</span></p>
+                             </div>
+                             <div class="space-y-2 mt-4">
+                                 <button id="start-race-button" class="w-full h-12 text-lg font-bold bg-green-500 text-white rounded-lg shadow-md transition-all duration-300 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed">Start Race</button>
+                                 <button id="play-again-button" class="w-full h-12 text-lg font-bold bg-blue-500 text-white rounded-lg shadow-md transition-all duration-300 hover:bg-blue-600 hidden">Play Again</button>
+                                 <button id="end-game-button" class="w-full h-12 text-lg font-bold bg-red-500 text-white rounded-lg shadow-md transition-all duration-300 hover:bg-red-600">End Game</button>
+                             </div>
+                         </div>
+                         <div id="game-message" class="mt-6 p-4 bg-blue-100 rounded-lg text-blue-800 text-center font-semibold">Place your bet and start the race!</div>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <div id="multiplayer-mode" class="hidden">
+            <header class="flex justify-between items-center mb-6">
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users text-purple-500"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <h1 class="text-3xl font-extrabold text-purple-700 tracking-tight">Multiplayer Race</h1>
+                </div>
+            </header>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                
+                <div class="lg:col-span-2">
+                    <div class="h-full flex flex-col p-6 shadow-lg rounded-2xl border-2 border-gray-100 bg-white">
+                        <div id="mp-session-setup">
+                            <h3 class="text-2xl font-bold text-purple-700 mb-4">Create a Session</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="mp-new-player-name" class="block text-sm font-medium text-gray-700 mb-2">Player Name</label>
+                                    <div class="flex space-x-2">
+                                        <input id="mp-new-player-name" type="text" placeholder="Enter player name" class="w-full h-10 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                        <button id="mp-add-player-name-btn" class="px-4 h-10 font-bold bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600">Add</button>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="text-lg font-semibold text-gray-800">Session Players:</h4>
+                                    <ul id="mp-session-player-list" class="list-disc list-inside space-y-1 text-gray-700">
+                                        </ul>
+                                </div>
+                            </div>
+                            <div class="mt-auto pt-6">
+                               <button id="mp-confirm-session-btn" class="w-full h-12 text-lg font-bold bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Start Session</button>
+                            </div>
+                        </div>
+
+                        <div id="mp-race-setup" class="hidden">
+                            <h3 class="text-2xl font-bold text-purple-700 mb-4">Set Up Race</h3>
+                            <div id="player-drop-selectors" class="space-y-4 mb-4">
+                                </div>
+                            <div class="space-y-2 mt-auto">
+                                <button id="start-race-button-mp" class="w-full h-12 text-lg font-bold bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600">Start Race</button>
+                                <button id="play-again-button-mp" class="w-full h-12 text-lg font-bold bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 hidden">Play Again</button>
+                                <button id="end-session-btn" class="w-full h-12 text-lg font-bold bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 mt-2">End Session</button>
+                            </div>
+                        </div>
+                        <div id="game-message-mp" class="mt-6 p-4 bg-purple-100 rounded-lg text-purple-800 text-center font-semibold">Add 2 to 10 players to start a session.</div>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-2">
+                    <div id="race-track-container-mp" class="race-track-container rainfall-bg">
+                        <div class="finish-line"></div>
+                        <div id="race-overlay-mp" class="race-overlay hidden">
+                             <h2 id="winner-message-mp" class="text-3xl md:text-5xl font-extrabold text-white text-center animate-pulse"></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-1">
+                     <div class="p-6 h-full shadow-lg rounded-2xl border-2 border-gray-100 bg-white">
+                         <h3 class="text-2xl font-bold text-purple-700 mb-4">Session Scoreboard</h3>
+                         <ul id="mp-scoreboard-list" class="space-y-2 font-medium text-gray-700">
+                            </ul>
+                     </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- MODE SWITCHING ---
+        const singlePlayerMode = document.getElementById('single-player-mode');
+        const multiplayerMode = document.getElementById('multiplayer-mode');
+        const showSpBtn = document.getElementById('show-singleplayer-btn');
+        const showMpBtn = document.getElementById('show-multiplayer-btn');
+
+        showMpBtn.addEventListener('click', () => {
+            singlePlayerMode.classList.add('hidden');
+            multiplayerMode.classList.remove('hidden');
+            showMpBtn.classList.add('bg-purple-600', 'text-white');
+            showMpBtn.classList.remove('bg-gray-200', 'text-gray-800');
+            showSpBtn.classList.add('bg-gray-200', 'text-gray-800');
+            showSpBtn.classList.remove('bg-blue-600', 'text-white');
+            mp.init();
+        });
+
+        showSpBtn.addEventListener('click', () => {
+            multiplayerMode.classList.add('hidden');
+            singlePlayerMode.classList.remove('hidden');
+            showSpBtn.classList.add('bg-blue-600', 'text-white');
+            showSpBtn.classList.remove('bg-gray-200', 'text-gray-800');
+            showMpBtn.classList.add('bg-gray-200', 'text-gray-800');
+            showMpBtn.classList.remove('bg-purple-600', 'text-white');
+        });
+
+        const totalDrops = 10;
+        const finishLine = 600 - 70;
+        let raceStatus = 'ready';
+        let animationFrameId = null;
+        let raceStartTime = 0;
+        let raindrops = [];
+
+        // --- UNIVERSAL FUNCTIONS ---
+        const initializeRaindrops = (containerId) => {
+            const raceTrackContainer = document.getElementById(containerId);
+            raindrops = [];
+            raceTrackContainer.querySelectorAll('.raindrop').forEach(drop => drop.remove());
+            const raceTrackWidth = raceTrackContainer.offsetWidth;
+            const dropWidth = 30;
+            const dropSpacing = (raceTrackWidth - (totalDrops * dropWidth)) / (totalDrops + 1);
+
+            for (let i = 1; i <= totalDrops; i++) {
+                const dropDiv = document.createElement('div');
+                dropDiv.className = 'raindrop';
+                dropDiv.style.left = `${(i - 1) * (dropWidth + dropSpacing) + dropSpacing}px`;
+                dropDiv.innerHTML = `<span class="raindrop-name">#${i}</span>`;
+                dropDiv.dataset.id = i;
+                raceTrackContainer.prepend(dropDiv);
+                raindrops.push({ id: i, element: dropDiv, position: 0, speed: 40 + Math.random() * 20 });
+            }
+        };
+
+        const animate = (raceEndHandler) => {
+            if (raceStatus !== 'racing') return;
+            if (!raceStartTime) raceStartTime = new Date().getTime();
+            
+            const now = new Date().getTime();
+            const elapsedSinceStart = now - raceStartTime;
+            let hasWinner = false;
+
+            raindrops.forEach(drop => {
+                if (drop.position >= finishLine) return;
+                const newPosition = drop.speed * (elapsedSinceStart / 1000);
+                drop.position = newPosition;
+                const cappedTop = Math.min(newPosition, finishLine);
+                drop.element.style.top = cappedTop + 'px';
+                if (cappedTop >= finishLine && !hasWinner) {
+                    hasWinner = true;
+                    raceStatus = 'finished';
+                    raceEndHandler(drop.id);
+                }
+            });
+
+            if (raceStatus === 'racing') {
+                animationFrameId = requestAnimationFrame(() => animate(raceEndHandler));
+            }
+        };
+
+        // --- SINGLE PLAYER LOGIC ---
+        const sp = {
+            balance: 1000,
+            betAmount: 100,
+            betDropId: null,
+            elems: {
+                balance: document.getElementById('balance-display'),
+                name: document.getElementById('user-name'),
+                buttons: document.getElementById('raindrop-buttons-container'),
+                slider: document.getElementById('bet-amount-slider'),
+                betValue: document.getElementById('bet-amount-value'),
+                maxBet: document.getElementById('max-bet-value'),
+                start: document.getElementById('start-race-button'),
+                playAgain: document.getElementById('play-again-button'),
+                end: document.getElementById('end-game-button'),
+                message: document.getElementById('game-message'),
+                track: document.getElementById('race-track-container-sp'),
+                overlay: document.getElementById('race-overlay-sp'),
+                winnerMsg: document.getElementById('winner-message-sp'),
+            },
+            init: () => {
+                initializeRaindrops('race-track-container-sp');
+                sp.createButtons();
+                sp.updateBalance();
+                sp.elems.start.addEventListener('click', sp.startRace);
+                sp.elems.playAgain.addEventListener('click', sp.reset);
+                sp.elems.end.addEventListener('click', sp.endGame);
+                sp.elems.slider.addEventListener('input', (e) => {
+                    sp.betAmount = parseInt(e.target.value);
+                    sp.elems.betValue.textContent = sp.betAmount;
+                });
+            },
+            updateBalance: () => {
+                sp.elems.balance.textContent = `$${sp.balance.toFixed(2)}`;
+                sp.elems.slider.max = sp.balance;
+                sp.elems.maxBet.textContent = sp.balance.toFixed(2);
+            },
+            createButtons: () => {
+                sp.elems.buttons.innerHTML = '';
+                for (let i = 1; i <= totalDrops; i++) {
+                    const btn = document.createElement('button');
+                    btn.textContent = i;
+                    btn.className = 'w-full px-4 py-2 font-bold text-sm bg-gray-100 text-gray-800 rounded-lg shadow-sm hover:bg-gray-200 transition-colors';
+                    btn.addEventListener('click', () => { if(raceStatus === 'ready') sp.selectDrop(i); });
+                    sp.elems.buttons.appendChild(btn);
+                }
+            },
+            selectDrop: (id) => {
+                sp.betDropId = id;
+                sp.elems.buttons.querySelectorAll('button').forEach(btn => {
+                    btn.className = `w-full px-4 py-2 font-bold text-sm rounded-lg shadow-sm transition-colors ${parseInt(btn.textContent) === id ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`;
+                });
+                raindrops.forEach(d => d.element.classList.remove('bet-raindrop'));
+                const betDrop = raindrops.find(d => d.id === id);
+                if(betDrop) betDrop.element.classList.add('bet-raindrop');
+            },
+            startRace: () => {
+                if (!sp.elems.name.value.trim() || sp.betDropId === null || sp.betAmount > sp.balance) {
+                    sp.elems.message.textContent = 'Please enter name, select drop, and check bet amount.';
+                    return;
+                }
+                raceStatus = 'racing';
+                raceStartTime = null;
+                sp.elems.message.textContent = 'The race is on!';
+                [sp.elems.start, sp.elems.end, sp.elems.name, sp.elems.slider].forEach(el => el.disabled = true);
+                const betDrop = raindrops.find(d => d.id === sp.betDropId);
+                betDrop.element.querySelector('.raindrop-name').textContent = sp.elems.name.value.trim().slice(0, 3).toUpperCase();
+                animationFrameId = requestAnimationFrame(() => animate(sp.handleRaceEnd));
+            },
+            handleRaceEnd: (winnerId) => {
+                cancelAnimationFrame(animationFrameId);
+                sp.elems.overlay.classList.remove('hidden');
+                sp.elems.winnerMsg.textContent = `Winner: Raindrop #${winnerId}!`;
+                const winnerElement = raindrops.find(d => d.id === winnerId).element;
+                winnerElement.classList.add('winner-raindrop');
+                if (winnerId === sp.betDropId) {
+                    sp.balance += sp.betAmount * 2;
+                    sp.elems.message.textContent = `You won $${(sp.betAmount*2).toFixed(2)}!`;
+                } else {
+                    sp.balance -= sp.betAmount;
+                    sp.elems.message.textContent = `You lost $${sp.betAmount.toFixed(2)}.`;
+                }
+                sp.updateBalance();
+                sp.elems.start.classList.add('hidden');
+                sp.elems.end.classList.add('hidden');
+                sp.elems.playAgain.classList.remove('hidden');
+            },
+            reset: () => {
+                raceStatus = 'ready'; sp.betDropId = null;
+                [sp.elems.start, sp.elems.end, sp.elems.name, sp.elems.slider].forEach(el => el.disabled = false);
+                sp.elems.start.classList.remove('hidden');
+                sp.elems.end.classList.remove('hidden');
+                sp.elems.playAgain.classList.add('hidden');
+                sp.elems.overlay.classList.add('hidden');
+                initializeRaindrops('race-track-container-sp');
+                sp.createButtons();
+            },
+            endGame: () => {
+                raceStatus = 'finished';
+                const finalScore = sp.balance;
+                sp.elems.message.textContent = `Game Over! Final score: $${finalScore.toFixed(2)}.`;
+                [sp.elems.start, sp.elems.end, sp.elems.name, sp.elems.slider, sp.elems.playAgain].forEach(el => { el.disabled = true; });
+            },
+        };
+        sp.init();
+
+
+        // --- MULTIPLAYER LOGIC ---
+        let mpPlayers = [];
+        let sessionPlayers = [];
+        let sessionActive = false;
+        
+        const mp = {
+            elems: {
+                sessionSetup: document.getElementById('mp-session-setup'),
+                raceSetup: document.getElementById('mp-race-setup'),
+                newPlayerName: document.getElementById('mp-new-player-name'),
+                addPlayerBtn: document.getElementById('mp-add-player-name-btn'),
+                sessionPlayerList: document.getElementById('mp-session-player-list'),
+                confirmSessionBtn: document.getElementById('mp-confirm-session-btn'),
+                dropSelectors: document.getElementById('player-drop-selectors'),
+                start: document.getElementById('start-race-button-mp'),
+                playAgain: document.getElementById('play-again-button-mp'),
+                endSession: document.getElementById('end-session-btn'),
+                message: document.getElementById('game-message-mp'),
+                track: document.getElementById('race-track-container-mp'),
+                overlay: document.getElementById('race-overlay-mp'),
+                winnerMsg: document.getElementById('winner-message-mp'),
+                scoreboard: document.getElementById('mp-scoreboard-list')
+            },
+            init: () => {
+                mp.elems.addPlayerBtn.addEventListener('click', mp.addSessionPlayer);
+                mp.elems.newPlayerName.addEventListener('keyup', (e) => { if(e.key === 'Enter') mp.addSessionPlayer()});
+                mp.elems.confirmSessionBtn.addEventListener('click', mp.confirmSession);
+                mp.elems.start.addEventListener('click', mp.startRace);
+                mp.elems.playAgain.addEventListener('click', mp.prepareNextRace);
+                mp.elems.endSession.addEventListener('click', mp.endSession);
+                mp.endSession(); // Start with a clean slate
+            },
+            addSessionPlayer: () => {
+                const name = mp.elems.newPlayerName.value.trim();
+                if (name && sessionPlayers.length < 10 && !sessionPlayers.includes(name)) {
+                    sessionPlayers.push(name);
+                    mp.elems.newPlayerName.value = '';
+                    mp.updateSessionPlayerList();
+                }
+                 mp.elems.newPlayerName.focus();
+            },
+            updateSessionPlayerList: () => {
+                mp.elems.sessionPlayerList.innerHTML = '';
+                sessionPlayers.forEach(name => {
+                    const li = document.createElement('li');
+                    li.textContent = name;
+                    mp.elems.sessionPlayerList.appendChild(li);
+                });
+                const canStart = sessionPlayers.length >= 2 && sessionPlayers.length <= 10;
+                mp.elems.confirmSessionBtn.disabled = !canStart;
+                mp.elems.message.textContent = canStart ? "Ready to start the session!" : "Add 2 to 10 players to start a session.";
+            },
+            confirmSession: () => {
+                sessionActive = true;
+                mpPlayers = sessionPlayers.map(name => ({ name, score: 0, dropId: null }));
+                mp.elems.sessionSetup.classList.add('hidden');
+                mp.elems.raceSetup.classList.remove('hidden');
+                mp.elems.endSession.classList.remove('hidden');
+                mp.updateScoreboard();
+                mp.prepareNextRace();
+            },
+            prepareNextRace: () => {
+                raceStatus = 'ready';
+                [mp.elems.start, mp.elems.endSession].forEach(el => el.disabled = false);
+                mp.elems.start.classList.remove('hidden');
+                mp.elems.playAgain.classList.add('hidden');
+                mp.elems.overlay.classList.add('hidden');
+                
+                initializeRaindrops('race-track-container-mp');
+                mp.createDropSelectors();
+                mp.elems.message.textContent = "Select a unique raindrop for each player.";
+            },
+            createDropSelectors: () => {
+                mp.elems.dropSelectors.innerHTML = '';
+                mpPlayers.forEach((player, index) => {
+                    const selectorDiv = document.createElement('div');
+                    selectorDiv.className = 'player-entry flex items-center space-x-2';
+                    selectorDiv.innerHTML = `
+                        <label class="font-semibold w-1/3">${player.name}:</label>
+                        <select class="player-drop-select-mp w-2/3 px-2 py-1 border rounded-md" data-player-name="${player.name}"></select>
+                    `;
+                    mp.elems.dropSelectors.appendChild(selectorDiv);
+                });
+                mp.updateDropdowns();
+                mp.elems.dropSelectors.querySelectorAll('.player-drop-select-mp').forEach(sel => {
+                    sel.addEventListener('change', mp.updateDropdowns);
+                });
+            },
+            updateDropdowns: () => {
+                const allSelects = mp.elems.dropSelectors.querySelectorAll('.player-drop-select-mp');
+                const selectedDrops = Array.from(allSelects).map(s => parseInt(s.value)).filter(v => !isNaN(v));
+                
+                allSelects.forEach(select => {
+                    const currentVal = parseInt(select.value);
+                    let optionsHtml = '<option value="">Drop?</option>';
+                    for(let i=1; i<=totalDrops; i++) {
+                        if(!selectedDrops.includes(i) || currentVal === i) {
+                            optionsHtml += `<option value="${i}" ${currentVal === i ? 'selected' : ''}>#${i}</option>`;
+                        }
+                    }
+                    select.innerHTML = optionsHtml;
+                });
+            },
+            startRace: () => {
+                let allReady = true;
+                const selects = mp.elems.dropSelectors.querySelectorAll('.player-drop-select-mp');
+                selects.forEach(select => {
+                    const playerName = select.dataset.playerName;
+                    const dropId = parseInt(select.value);
+                    const player = mpPlayers.find(p => p.name === playerName);
+                    if (isNaN(dropId)) {
+                        allReady = false;
+                    } else {
+                        player.dropId = dropId;
+                    }
+                });
+
+                if(!allReady) {
+                    mp.elems.message.textContent = 'Each player must select a unique raindrop.';
+                    return;
+                }
+
+                raceStatus = 'racing';
+                raceStartTime = null;
+                mp.elems.message.textContent = 'The race is on!';
+                mp.elems.start.disabled = true;
+                mp.elems.endSession.disabled = true;
+
+                mpPlayers.forEach((player, index) => {
+                    const drop = raindrops.find(d => d.id === player.dropId);
+                    if(drop) {
+                        drop.element.querySelector('.raindrop-name').textContent = player.name.slice(0, 3).toUpperCase();
+                        drop.element.classList.add(`player-drop-${(index % 5) + 1}`);
+                    }
+                });
+                animationFrameId = requestAnimationFrame(() => animate(mp.handleRaceEnd));
+            },
+            handleRaceEnd: (winnerId) => {
+                cancelAnimationFrame(animationFrameId);
+                const winningPlayer = mpPlayers.find(p => p.dropId === winnerId);
+                
+                mp.elems.overlay.classList.remove('hidden');
+                
+                if(winningPlayer) {
+                    mp.elems.winnerMsg.textContent = `${winningPlayer.name} wins!`;
+                    winningPlayer.score++;
+                } else {
+                    mp.elems.winnerMsg.textContent = `Raindrop #${winnerId} wins!`;
+                }
+                
+                const winnerElement = raindrops.find(d => d.id === winnerId).element;
+                winnerElement.classList.add('winner-raindrop');
+
+                mp.updateScoreboard();
+                mp.elems.start.classList.add('hidden');
+                mp.elems.playAgain.classList.remove('hidden');
+            },
+            updateScoreboard: () => {
+                mp.elems.scoreboard.innerHTML = '';
+                 if (mpPlayers.length === 0) {
+                     mp.elems.scoreboard.innerHTML = '<li>Session not started.</li>';
+                     return;
+                 }
+                mpPlayers.sort((a,b) => b.score - a.score).forEach(p => {
+                    const li = document.createElement('li');
+                    li.className = 'p-2 rounded-md bg-gray-50';
+                    li.textContent = `${p.name}: ${p.score} wins`;
+                    mp.elems.scoreboard.appendChild(li);
+                });
+            },
+            endSession: () => {
+                sessionActive = false;
+                sessionPlayers = [];
+                mpPlayers = [];
+                mp.updateScoreboard();
+                mp.updateSessionPlayerList();
+                
+                mp.elems.sessionSetup.classList.remove('hidden');
+                mp.elems.raceSetup.classList.add('hidden');
+                mp.elems.overlay.classList.add('hidden');
+                [mp.elems.start, mp.elems.playAgain, mp.elems.endSession].forEach(el => el.classList.add('hidden'));
+                
+                mp.elems.message.textContent = "Add 2 to 10 players to start a session.";
+                initializeRaindrops('race-track-container-mp');
+            }
+        };
+    });
+    </script>
+
+</body>
+</html>
