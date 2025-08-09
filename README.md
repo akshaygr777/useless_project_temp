@@ -1,98 +1,98 @@
 <img width="3188" height="1202" alt="frame (3)" src="https://github.com/user-attachments/assets/517ad8e9-ad22-457d-9538-a9e62d137cd7" />
 
 
-# [Project Name] 🎯
-
+# Rainy Odds 🎯
 
 ## Basic Details
-### Team Name: [Name]
 
+### Team Name: Clankers
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+
+  - Team Lead: Akshay G R - Sree Chitra Thirunal College of Engineering, Pappanamcode
+  - Member 2: Joshua John Varghese - Sree Chitra Thirunal College of Engineering, Pappanamcode
 
 ### Project Description
-[2-3 lines about what your project does]
+
+Rainy Odds is a thrilling web-based racing game where users can bet on realistically rendered, falling raindrops. It features a single-player mode and a local multiplayer mode for friends to compete against each other. It simulates real-life betting but with a fun twist of betting on raindrops falling.
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+
+Productivity is at an all-time high, but what happens when it rains? People get distracted watching raindrops race down windows. This agonizing, unmonetized suspense leads to billions in lost... fun. Humanity needs a way to formalize this natural pastime and add the thrill of losing imaginary money.
 
 ### The Solution (that nobody asked for)
-[How are you solving it? Keep it fun!]
+
+Rainy Odds provides a sophisticated, high-stakes platform for raindrop racing. By digitizing the windowpane, we allow users to bet on their favorite drops, compete against friends in local multiplayer, and immortalize their winnings on a prestigious leaderboard. And guess what's fun? It's completely useless and a waste of time. It's the pinnacle of useless, weather-based entertainment.
 
 ## Technical Details
+
 ### Technologies/Components Used
+
 For Software:
-- [Languages used]
-- [Frameworks used]
-- [Libraries used]
-- [Tools used]
+
+  - **Languages:** HTML5, CSS3, JavaScript (ES6+)
+  - **Frameworks:** Tailwind CSS for styling.
+  - **Libraries:** None.
+  - **Tools:** Visual Studio Code, Git & GitHub, Web Browser DevTools.
 
 For Hardware:
-- [List main components]
-- [List specifications]
-- [List tools required]
+
+  - Not Applicable.
 
 ### Implementation
+
 For Software:
+
 # Installation
-[commands]
+
+No installation is needed. Just download the `index.html` file and open it in any modern web browser.
 
 # Run
-[commands]
+
+Double-click the `index.html` file to launch the game.
 
 ### Project Documentation
+
 For Software:
 
 # Screenshots (Add at least 3)
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
+<img width="1280" height="622" alt="image" src="https://github.com/user-attachments/assets/605fb822-acfd-446c-843a-541bdcc335be" />
+<img width="1280" height="620" alt="image" src="https://github.com/user-attachments/assets/ee477b12-d99f-4072-9f49-f6b959895b01" />
+<img width="1280" height="629" alt="image" src="https://github.com/user-attachments/assets/b2864e96-badc-48c4-b1d8-60cac2f8af98" />
+<img width="1280" height="625" alt="image" src="https://github.com/user-attachments/assets/829be85f-c22e-451b-8c01-0185691007f2" />
+<img width="1280" height="642" alt="image" src="https://github.com/user-attachments/assets/7493c587-79d3-435e-935e-07b25e0ab692" />
+<img width="1280" height="621" alt="image" src="https://github.com/user-attachments/assets/e5abfc3d-94a0-4080-bbbd-6dbd4e3fd6c2" />
+<img width="1280" height="628" alt="image" src="https://github.com/user-attachments/assets/dbf1b4af-6bf0-4848-b5dc-700928dfe3a3" />
 
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
 
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
+
+
+
+
+
+
 
 # Diagrams
-![Workflow](Add your workflow/architecture diagram here)
-*Add caption explaining your workflow*
 
-For Hardware:
+*This diagram shows the basic user flow, from selecting a game mode to playing rounds and viewing scores.*
 
-# Schematic & Circuit
-![Circuit](Add your circuit diagram here)
-*Add caption explaining connections*
-
-![Schematic](Add your schematic diagram here)
-*Add caption explaining the schematic*
-
-# Build Photos
-![Components](Add photo of your components here)
-*List out all components shown*
-
-![Build](Add photos of build process here)
-*Explain the build steps*
-
-![Final](Add photo of final product here)
-*Explain the final build*
+For Hardware: Not Applicable.
 
 ### Project Demo
+
 # Video
+
 [Add your demo video link here]
-*Explain what the video demonstrates*
+*The video demonstrates both single-player and multiplayer game modes, including player setup, a full race, and the final scoreboard/leaderboard display.*
 
 # Additional Demos
+
 [Add any extra demo materials/links]
 
-## Team Contributions
-- [Name 1]: [Specific contributions]
-- [Name 2]: [Specific contributions]
-- [Name 3]: [Specific contributions]
 
----
+
+-----
+
 Made with ❤️ at TinkerHub Useless Projects 
 
 ![Static Badge](https://img.shields.io/badge/TinkerHub-24?color=%23000000&link=https%3A%2F%2Fwww.tinkerhub.org%2F)
